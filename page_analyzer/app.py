@@ -28,10 +28,10 @@ def normalize_url(url):
 
 
 def truncate_text(text):
-    if text and len(text) > 255:
-        return text[:252] + '...'
+    if not text:
+        return text
 
-    return text
+    return text[:252] + '...'
 
 
 @app.route('/', methods=['GET', 'POST'])
