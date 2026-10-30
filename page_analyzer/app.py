@@ -211,8 +211,8 @@ def create_check(url_id):
         flash('La página fue verificada correctamente', 'success')
 
     except requests.RequestException:
-        app.logger.exception('Error al hacer la verificación')
-        flash('Error al verificar', 'danger')
+    	app.logger.exception('Error al hacer la verificación')
+    	flash('Ocurrió un error durante la verificación', 'danger')
 
     except psycopg.Error:
         app.logger.exception(
