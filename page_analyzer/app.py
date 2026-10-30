@@ -1,4 +1,3 @@
-
 import os
 
 import psycopg
@@ -33,7 +32,7 @@ def index():
             return redirect(url_for('index'))
 
         if not validators.url(url):
-            flash('Introduce una URL válida, por ejemplo https://example.com.', 'danger')
+            flash('URL inválida', 'danger')
             return redirect(url_for('index'))
 
         try:
@@ -49,9 +48,9 @@ def index():
                 ).fetchone()
 
             if result:
-                flash('La URL se ha añadido correctamente.', 'success')
+                flash('La página se agregó correctamente', 'success')
             else:
-                flash('Esta URL ya existe.', 'warning')
+                flash('La página ya existe', 'warning')
 
         except psycopg.Error:
             app.logger.exception('Error al guardar la URL en la base de datos')
@@ -164,11 +163,11 @@ def create_check(url_id):
                 (url_id, response.status_code, h1, title, description),
             )
 
-        flash('La revisión se ha registrado correctamente.', 'success')
+        flash('Página verificada con éxito', 'success')
 
     except requests.RequestException:
         app.logger.exception('Error al hacer la verificación')
-        flash('Ocurrió un error al hacer la verificación', 'danger')
+        flash('Error al verificar', 'danger')
 
     except psycopg.Error:
         app.logger.exception('Error al registrar la revisión en la base de datos')
