@@ -31,7 +31,7 @@ def truncate_text(text):
     if not text:
         return text
 
-    return text[:252] + '...'
+    return text[:200] + '...'
 
 
 @app.route('/', methods=['GET', 'POST'])
