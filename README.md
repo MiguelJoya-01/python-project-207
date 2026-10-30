@@ -22,7 +22,7 @@ The project was developed as part of the Python programming course at Códica.
 
 ## Technologies
 
-- Python 3.12.3
+- Python 3.12+
 - Flask
 - PostgreSQL
 - Psycopg
@@ -37,7 +37,7 @@ The project was developed as part of the Python programming course at Códica.
 
 ### Requirements
 
-- Python 3.12.3
+- Python 3.12 or higher
 - PostgreSQL
 - [uv](https://docs.astral.sh/uv/)
 
@@ -67,7 +67,7 @@ Make sure PostgreSQL is running and that the database exists.
 ### 4. Create the database tables
 
 ```bash
-psql -d "$DATABASE_URL" -f database.sql
+psql -d postgresql:///page_analyzer -f database.sql
 ```
 
 ### 5. Run the application
