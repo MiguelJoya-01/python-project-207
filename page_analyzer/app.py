@@ -57,7 +57,7 @@ def urls():
 
         if not validators.url(url):
             flash('URL inválida', 'danger')
-            return redirect(url_for('index'))
+            return render_template('urls.html', urls=[]), 422
 
         try:
             hostname = normalize_url(url)
