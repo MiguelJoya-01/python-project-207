@@ -1,43 +1,133 @@
-# Analizador de páginas
+# Page Analyzer
 
 [![hexlet-check](https://github.com/MiguelJoya-01/python-project-207/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/MiguelJoya-01/python-project-207/actions)
 
-En este proyecto vas a crear una app web real que analiza páginas, guarda los resultados en una base de datos y se publica en línea.
-También aprenderás a usar integración continua (CI), como en los proyectos profesionales.
+Page Analyzer is a web application built with Flask that allows users to add websites, check their availability, and collect basic SEO information from their pages.
 
-Proyecto de aprendizaje de Códica: https://app.codica.la/programs/python
-Así debería funcionar: https://files.hexlet.app/a/gw25qr
+The project was developed as part of the Python programming course at Códica.
 
-## Stack
+## Features
 
-- Python
+- Add and store website URLs.
+- Validate URLs before saving them.
+- Prevent duplicate URLs.
+- View a list of registered websites.
+- Check website availability and HTTP status codes.
+- Extract basic SEO information:
+  - Page title
+  - Main heading (`h1`)
+  - Meta description
+- View the history of checks for each website.
+- Store application data in a PostgreSQL database.
 
-## Instalación
+## Technologies
 
-<!-- Describa la instalación: clonación, dependencias, variables de entorno -->
+- Python 3.12.3
+- Flask
+- PostgreSQL
+- Psycopg
+- Requests
+- Beautiful Soup 4
+- Bootstrap
+- Gunicorn
+- Ruff
+- uv
+
+## Installation
+
+### Requirements
+
+- Python 3.12.3
+- PostgreSQL
+- [uv](https://docs.astral.sh/uv/)
+
+### 1. Clone the repository
 
 ```bash
 git clone https://github.com/MiguelJoya-01/python-project-207.git
 cd python-project-207
 ```
 
-## Uso
+### 2. Install dependencies
 
-<!-- Agregue ejemplos de ejecución y una grabación de asciinema: esto es lo que miran los empleadores -->
+```bash
+make install
+```
 
----
+### 3. Configure environment variables
 
-<details>
-<summary>Pruebas automáticas de Códica</summary>
+Create a `.env` file in the project root and set your database connection string:
 
-Las pruebas se ejecutan en cada commit. El archivo `.github/workflows/hexlet-check.yml` es el responsable de ejecutarlas: no lo elimine ni lo renombre, y no cambie el nombre del repositorio.
+```env
+DATABASE_URL=postgresql:///page_analyzer
+```
 
-</details>
+Make sure PostgreSQL is running and that the database exists.
 
-## Acerca de Códica
+### 4. Create the database tables
 
-[Códica](https://app.codica.la/) es una escuela de programación: programas de aprendizaje propios con práctica, apoyo de mentores y proyectos reales que quedan en su currículum. Este repositorio es uno de esos proyectos.
+```bash
+psql -d "$DATABASE_URL" -f database.sql
+```
 
-## Demo
+### 5. Run the application
 
-[Analizador de páginas](https://tu-servicio.onrender.com)
+```bash
+make dev
+```
+
+The development server will be available at:
+
+`http://127.0.0.1:5000`
+
+## Available Commands
+
+The project includes a Makefile with the following commands:
+
+| Command | Description |
+|---|---|
+| `make install` | Install project dependencies using uv. |
+| `make dev` | Run the Flask development server. |
+| `make lint` | Check the code with Ruff. |
+| `make start` | Run the application with Gunicorn. |
+| `make build` | Execute the build script. |
+| `make render-start` | Start the application with Gunicorn on the configured port. |
+
+## Build
+
+The `build.sh` script automates the build process. It installs uv if necessary, installs the project dependencies, and creates the database tables using `database.sql`.
+
+Run it with:
+
+```bash
+make build
+```
+
+## Database
+
+The application uses PostgreSQL to store website information and their verification history.
+
+The database schema is defined in `database.sql` and includes two tables:
+
+- `urls`: stores registered websites and their creation dates.
+- `url_checks`: stores the results of website checks, including HTTP status codes and SEO information.
+
+## Automated Checks
+
+The project uses GitHub Actions to run the automated checks configured in the repository.
+
+You can also run the code linter locally with:
+
+```bash
+make lint
+```
+
+## Deployment
+
+The application is deployed on Render:
+
+[Page Analyzer](https://python-project-207-94zu.onrender.com)
+
+## About the Project
+
+This project was developed as a practical exercise in building a web application with Python and Flask. It brings together topics such as routing, database management, HTTP requests, HTML parsing, and deployment.
