@@ -47,16 +47,32 @@ def index():
                     (url,),
                 ).fetchone()
 
-            if result:
-                flash('La página se agregó correctamente', 'success')
-            else:
-                flash('La página ya existe', 'warning')
+                if result:
+                    url_id = result[0]
+                    flash(
+                        'La página se agregó correctamente',
+                        'success',
+                    )
+                else:
+                    existing_url = conn.execute(
+                        'SELECT id FROM urls WHERE name = %s',
+                        (url,),
+                    ).fetchone()
+
+                    url_id = existing_url[0]
+                    flash('La página ya existe', 'warning')
+
+            return redirect(url_for('show_url', url_id=url_id))
 
         except psycopg.Error:
-            app.logger.exception('Error al guardar la URL en la base de datos')
-            flash('No se pudo guardar la URL. Inténtalo de nuevo.', 'danger')
-
-        return redirect(url_for('index'))
+            app.logger.exception(
+                'Error al guardar la URL en la base de datos'
+            )
+            flash(
+                'No se pudo guardar la URL. Inténtalo de nuevo.',
+                'danger',
+            )
+            return redirect(url_for('index'))
 
     return render_template('index.html')
 
@@ -170,7 +186,9 @@ def create_check(url_id):
         flash('Error al verificar', 'danger')
 
     except psycopg.Error:
-        app.logger.exception('Error al registrar la revisión en la base de datos')
+        app.logger.exception(
+            'Error al registrar la revisión en la base de datos'
+        )
         flash('No se pudo registrar la revisión.', 'danger')
 
     return redirect(url_for('show_url', url_id=url_id))
