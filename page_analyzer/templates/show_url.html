@@ -21,6 +21,16 @@
     <main class="container mt-5">
       <h1 class="mb-4">Información del sitio</h1>
 
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="alert alert-{{ category }}" role="alert">
+              {{ message }}
+            </div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
       <table class="table table-striped" data-test="url">
         <tbody>
           <tr>
@@ -37,6 +47,43 @@
             <th>Fecha de creación</th>
             <td>{{ url[2].strftime('%Y-%m-%d %H:%M:%S') }}</td>
           </tr>
+        </tbody>
+      </table>
+
+      <form action="{{ url_for('create_check', url_id=url[0]) }}" method="post">
+        <button type="submit" class="btn btn-primary">
+          Realizar revisión
+        </button>
+      </form>
+
+      <h2 class="mt-5 mb-3">Revisiones</h2>
+
+      <table class="table table-striped" data-test="checks">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Código de estado</th>
+            <th>H1</th>
+            <th>Título</th>
+            <th>Descripción</th>
+            <th>Fecha de revisión</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for check in checks %}
+            <tr>
+              <td>{{ check[0] }}</td>
+              <td>{{ check[2] or '' }}</td>
+              <td>{{ check[3] or '' }}</td>
+              <td>{{ check[4] or '' }}</td>
+              <td>{{ check[5] or '' }}</td>
+              <td>{{ check[6].strftime('%Y-%m-%d %H:%M:%S') }}</td>
+            </tr>
+          {% else %}
+            <tr>
+              <td colspan="6">Todavía no hay revisiones registradas.</td>
+            </tr>
+          {% endfor %}
         </tbody>
       </table>
 

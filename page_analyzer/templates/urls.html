@@ -31,6 +31,7 @@
             <th>ID</th>
             <th>URL</th>
             <th>Fecha de creación</th>
+            <th>Última revisión</th>
           </tr>
         </thead>
         <tbody>
@@ -43,10 +44,17 @@
                 </a>
               </td>
               <td>{{ url[2].strftime('%Y-%m-%d %H:%M:%S') }}</td>
+              <td>
+                {% if url[3] %}
+                  {{ url[3].strftime('%Y-%m-%d %H:%M:%S') }}
+                {% else %}
+                  —
+                {% endif %}
+              </td>
             </tr>
           {% else %}
             <tr>
-              <td colspan="3">Todavía no hay URLs registradas.</td>
+              <td colspan="4">Todavía no hay URLs registradas.</td>
             </tr>
           {% endfor %}
         </tbody>
