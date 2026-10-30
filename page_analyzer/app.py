@@ -34,8 +34,13 @@ def truncate_text(text):
     return text[:200] + '...'
 
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/')
 def index():
+    return render_template('index.html')
+
+
+@app.route('/urls', methods=['GET', 'POST'])
+def urls():
     if request.method == 'POST':
         url = request.form.get('url', '').strip()
 
@@ -101,11 +106,6 @@ def index():
             )
             return redirect(url_for('index'))
 
-    return render_template('index.html')
-
-
-@app.route('/urls')
-def urls():
     with get_db_connection() as conn:
         urls_list = conn.execute(
             '''
