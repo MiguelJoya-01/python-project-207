@@ -1,8 +1,10 @@
+
 import os
 
 import psycopg
 import requests
 import validators
+from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 from flask import Flask, flash, redirect, render_template, request, url_for
 
@@ -129,13 +131,37 @@ def create_check(url_id):
         response = requests.get(url[1], timeout=10)
         response.raise_for_status()
 
+        soup = BeautifulSoup(response.text, 'html.parser')
+
+        h1_tag = soup.find('h1')
+        h1 = h1_tag.get_text(strip=True) if h1_tag else None
+
+        title_tag = soup.find('title')
+        title = title_tag.get_text(strip=True) if title_tag else None
+
+        description_tag = soup.find(
+            'meta',
+            attrs={'name': 'description'},
+        )
+        description = (
+            description_tag.get('content')
+            if description_tag
+            else None
+        )
+
         with get_db_connection() as conn:
             conn.execute(
                 '''
-                INSERT INTO url_checks (url_id, status_code)
-                VALUES (%s, %s)
+                INSERT INTO url_checks (
+                    url_id,
+                    status_code,
+                    h1,
+                    title,
+                    description
+                )
+                VALUES (%s, %s, %s, %s, %s)
                 ''',
-                (url_id, response.status_code),
+                (url_id, response.status_code, h1, title, description),
             )
 
         flash('La revisión se ha registrado correctamente.', 'success')
