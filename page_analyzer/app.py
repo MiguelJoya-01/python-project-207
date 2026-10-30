@@ -1,6 +1,7 @@
 import os
 
 import psycopg
+import requests
 import validators
 from dotenv import load_dotenv
 from flask import Flask, flash, redirect, render_template, request, url_for
@@ -68,10 +69,16 @@ def urls():
                 urls.id,
                 urls.name,
                 urls.created_at,
-                MAX(url_checks.created_at) AS last_check
+                last_check.created_at,
+                last_check.status_code
             FROM urls
-            LEFT JOIN url_checks ON urls.id = url_checks.url_id
-            GROUP BY urls.id
+            LEFT JOIN LATERAL (
+                SELECT created_at, status_code
+                FROM url_checks
+                WHERE url_id = urls.id
+                ORDER BY id DESC
+                LIMIT 1
+            ) AS last_check ON TRUE
             ORDER BY urls.id DESC
             '''
         ).fetchall()
@@ -112,25 +119,33 @@ def create_check(url_id):
     try:
         with get_db_connection() as conn:
             url = conn.execute(
-                'SELECT id FROM urls WHERE id = %s',
+                'SELECT id, name FROM urls WHERE id = %s',
                 (url_id,),
             ).fetchone()
 
             if url is None:
                 return 'URL no encontrada', 404
 
+        response = requests.get(url[1], timeout=10)
+        response.raise_for_status()
+
+        with get_db_connection() as conn:
             conn.execute(
                 '''
-                INSERT INTO url_checks (url_id)
-                VALUES (%s)
+                INSERT INTO url_checks (url_id, status_code)
+                VALUES (%s, %s)
                 ''',
-                (url_id,),
+                (url_id, response.status_code),
             )
 
         flash('La revisión se ha registrado correctamente.', 'success')
 
+    except requests.RequestException:
+        app.logger.exception('Error al hacer la verificación')
+        flash('Ocurrió un error al hacer la verificación', 'danger')
+
     except psycopg.Error:
-        app.logger.exception('Error al registrar la revisión')
+        app.logger.exception('Error al registrar la revisión en la base de datos')
         flash('No se pudo registrar la revisión.', 'danger')
 
     return redirect(url_for('show_url', url_id=url_id))

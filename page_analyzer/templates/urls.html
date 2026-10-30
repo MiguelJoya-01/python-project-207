@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="es">
   <head>
@@ -32,6 +33,7 @@
             <th>URL</th>
             <th>Fecha de creación</th>
             <th>Última revisión</th>
+            <th>Código de estado</th>
           </tr>
         </thead>
         <tbody>
@@ -51,10 +53,17 @@
                   —
                 {% endif %}
               </td>
+              <td>
+                {% if url[4] %}
+                  {{ url[4] }}
+                {% else %}
+                  —
+                {% endif %}
+              </td>
             </tr>
           {% else %}
             <tr>
-              <td colspan="4">Todavía no hay URLs registradas.</td>
+              <td colspan="5">Todavía no hay URLs registradas.</td>
             </tr>
           {% endfor %}
         </tbody>
@@ -62,3 +71,4 @@
     </main>
   </body>
 </html>
+
