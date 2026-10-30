@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="es">
   <head>
@@ -10,12 +11,51 @@
     >
   </head>
   <body>
+    <header class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <div class="container">
+        <a class="navbar-brand" href="{{ url_for('index') }}">
+          Analizador de páginas
+        </a>
+      </div>
+    </header>
+
     <main class="container mt-5">
       <h1 class="display-5 text-center">Analizador de páginas</h1>
       <p class="lead text-center mt-3">
         Analiza páginas web y consulta información sobre ellas.
       </p>
+
+      <div class="row justify-content-center mt-4">
+        <div class="col-md-8 col-lg-6">
+          {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+              {% for category, message in messages %}
+                <div class="alert alert-{{ category }}" role="alert">
+                  {{ message }}
+                </div>
+              {% endfor %}
+            {% endif %}
+          {% endwith %}
+
+          <form action="{{ url_for('index') }}" method="post">
+            <div class="mb-3">
+              <label for="url" class="form-label">URL del sitio</label>
+              <input
+                type="text"
+                class="form-control"
+                id="url"
+                name="url"
+                maxlength="255"
+                placeholder="https://example.com"
+                required
+              >
+            </div>
+            <button type="submit" class="btn btn-primary">
+              Añadir
+            </button>
+          </form>
+        </div>
+      </div>
     </main>
   </body>
 </html>
-
