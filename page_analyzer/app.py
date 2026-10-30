@@ -195,7 +195,7 @@ def create_check(url_id):
                 (url_id, response.status_code, h1, title, description),
             )
 
-        flash('Página verificada con éxito', 'success')
+        flash('La página fue verificada correctamente', 'success')
 
     except requests.RequestException:
         app.logger.exception('Error al hacer la verificación')
