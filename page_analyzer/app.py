@@ -26,6 +26,14 @@ def normalize_url(url):
 
     return hostname
 
+
+def truncate_text(text):
+    if text and len(text) > 255:
+        return text[:252] + '...'
+
+    return text
+
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
@@ -36,7 +44,10 @@ def index():
             return redirect(url_for('index'))
 
         if len(url) > 255:
-            flash('La URL no puede superar los 255 caracteres.', 'danger')
+            flash(
+                'La URL no puede superar los 255 caracteres.',
+                'danger',
+            )
             return redirect(url_for('index'))
 
         if not validators.url(url):
@@ -165,19 +176,21 @@ def create_check(url_id):
         soup = BeautifulSoup(response.text, 'html.parser')
 
         h1_tag = soup.find('h1')
-        h1 = h1_tag.get_text(strip=True) if h1_tag else None
+        h1 = truncate_text(
+            h1_tag.get_text(strip=True) if h1_tag else None
+        )
 
         title_tag = soup.find('title')
-        title = title_tag.get_text(strip=True) if title_tag else None
+        title = truncate_text(
+            title_tag.get_text(strip=True) if title_tag else None
+        )
 
         description_tag = soup.find(
             'meta',
             attrs={'name': 'description'},
         )
-        description = (
-            description_tag.get('content')
-            if description_tag
-            else None
+        description = truncate_text(
+            description_tag.get('content') if description_tag else None
         )
 
         with get_db_connection() as conn:
