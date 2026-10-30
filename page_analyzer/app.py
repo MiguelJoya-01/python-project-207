@@ -1,4 +1,5 @@
 import os
+from urllib.parse import urlparse
 
 import psycopg
 import requests
@@ -18,6 +19,13 @@ def get_db_connection():
     return psycopg.connect(database_url)
 
 
+def normalize_url(url):
+    parsed_url = urlparse(url)
+    hostname = (parsed_url.hostname or '').lower()
+    hostname = hostname.removeprefix('www.')
+
+    return hostname
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
@@ -36,31 +44,39 @@ def index():
             return redirect(url_for('index'))
 
         try:
-            with get_db_connection() as conn:
-                result = conn.execute(
-                    '''
-                    INSERT INTO urls (name)
-                    VALUES (%s)
-                    ON CONFLICT (name) DO NOTHING
-                    RETURNING id
-                    ''',
-                    (url,),
-                ).fetchone()
+            hostname = normalize_url(url)
 
-                if result:
+            with get_db_connection() as conn:
+                urls_list = conn.execute(
+                    'SELECT id, name FROM urls'
+                ).fetchall()
+
+                existing_url = next(
+                    (
+                        item for item in urls_list
+                        if normalize_url(item[1]) == hostname
+                    ),
+                    None,
+                )
+
+                if existing_url:
+                    url_id = existing_url[0]
+                    flash('La página ya existe', 'warning')
+                else:
+                    result = conn.execute(
+                        '''
+                        INSERT INTO urls (name)
+                        VALUES (%s)
+                        RETURNING id
+                        ''',
+                        (url,),
+                    ).fetchone()
+
                     url_id = result[0]
                     flash(
                         'La página se agregó correctamente',
                         'success',
                     )
-                else:
-                    existing_url = conn.execute(
-                        'SELECT id FROM urls WHERE name = %s',
-                        (url,),
-                    ).fetchone()
-
-                    url_id = existing_url[0]
-                    flash('La página ya existe', 'warning')
 
             return redirect(url_for('show_url', url_id=url_id))
 
